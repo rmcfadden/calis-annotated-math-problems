@@ -6,6 +6,7 @@ type SidebarProps = {
   mobileOpen: boolean
   onToggle: () => void
   onCloseMobile: () => void
+  showAuthorLink?: boolean
 }
 
 const linkClass = ({ isActive }: { isActive: boolean }) =>
@@ -14,7 +15,13 @@ const linkClass = ({ isActive }: { isActive: boolean }) =>
     isActive ? 'bg-ink text-paper' : 'text-ink/80 hover:bg-ink/5 hover:text-ink',
   ].join(' ')
 
-export function Sidebar({ collapsed, mobileOpen, onToggle, onCloseMobile }: SidebarProps) {
+export function Sidebar({
+  collapsed,
+  mobileOpen,
+  onToggle,
+  onCloseMobile,
+  showAuthorLink = import.meta.env.DEV,
+}: SidebarProps) {
   return (
     <>
       {mobileOpen ? (
@@ -71,7 +78,7 @@ export function Sidebar({ collapsed, mobileOpen, onToggle, onCloseMobile }: Side
               </li>
             ))}
           </ul>
-          {import.meta.env.DEV ? (
+          {showAuthorLink ? (
             <NavLink
               to="/author"
               className={`${linkClass({ isActive: false })} mt-6 border border-dashed border-ink/20`}

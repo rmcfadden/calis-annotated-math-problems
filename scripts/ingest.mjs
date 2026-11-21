@@ -1,11 +1,12 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
+import { pathToFileURL } from 'node:url'
 
-const PROBLEMS_DIR = path.resolve('src/content/problems')
+const DEFAULT_PROBLEMS_DIR = path.resolve('src/content/problems')
 const ALLOWED = new Set(['.jpg', '.jpeg', '.png', '.webp', '.svg'])
 
-function slugify(value) {
+export function slugify(value) {
   return value
     .toLowerCase()
     .trim()
@@ -13,7 +14,7 @@ function slugify(value) {
     .replace(/^-+|-+$/g, '')
 }
 
-function parseArgs(argv) {
+export function parseArgs(argv) {
   const args = { positional: [], flags: {} }
   for (let i = 0; i < argv.length; i += 1) {
     const token = argv[i]
@@ -33,47 +34,69 @@ function parseArgs(argv) {
   return args
 }
 
-const { positional, flags } = parseArgs(process.argv.slice(2))
-const imagePath = positional[0]
+export function ingest(argv, options = {}) {
+  const problemsDir = options.problemsDir || process.env.PROBLEMS_DIR || DEFAULT_PROBLEMS_DIR
+  const { positional, flags } = parseArgs(argv)
+  const imagePath = positional[0]
 
-if (!imagePath) {
-  console.error('Usage: npm run ingest -- path/to/photo.jpg --topic algebra --title "My problem"')
-  process.exit(1)
+  if (!imagePath) {
+    return { status: 1, error: 'Usage: npm run ingest -- path/to/photo.jpg --topic algebra --title "My problem"' }
+  }
+
+  const resolved = path.resolve(imagePath)
+  if (!fs.existsSync(resolved)) {
+    return { status: 1, error: `No file at ${resolved}` }
+  }
+
+  const ext = path.extname(resolved).toLowerCase()
+  if (!ALLOWED.has(ext)) {
+    return { status: 1, error: 'Use a .jpg, .jpeg, .png, .webp, or .svg image.' }
+  }
+
+  const title =
+    typeof flags.title === 'string'
+      ? flags.title
+      : path.basename(resolved, ext).replace(/[_-]+/g, ' ')
+  const slug = slugify(typeof flags.slug === 'string' ? flags.slug : title)
+  const topic = typeof flags.topic === 'string' ? flags.topic : undefined
+  const dir = path.join(problemsDir, slug)
+
+  if (fs.existsSync(dir)) {
+    return { status: 1, error: `A problem named "${slug}" already exists.` }
+  }
+
+  const photoName = `photo${ext === '.jpeg' ? '.jpg' : ext}`
+  fs.mkdirSync(dir, { recursive: true })
+  fs.copyFileSync(resolved, path.join(dir, photoName))
+
+  const topicLine = topic ? `topic: ${topic}\n` : ''
+  fs.writeFileSync(
+    path.join(dir, 'problem.mdx'),
+    `---\ntitle: ${JSON.stringify(title)}\n${topicLine}---\n`,
+  )
+
+  return { status: 0, dir }
 }
 
-const resolved = path.resolve(imagePath)
-if (!fs.existsSync(resolved)) {
-  console.error(`No file at ${resolved}`)
-  process.exit(1)
+export function isEntryPoint(metaUrl, entryPath) {
+  if (!entryPath) return false
+  return metaUrl === pathToFileURL(path.resolve(entryPath)).href
 }
 
-const ext = path.extname(resolved).toLowerCase()
-if (!ALLOWED.has(ext)) {
-  console.error('Use a .jpg, .jpeg, .png, .webp, or .svg image.')
-  process.exit(1)
+export function runCli(argv = process.argv.slice(2), io = console) {
+  const result = ingest(argv)
+  if (result.error) {
+    io.error(result.error)
+  } else {
+    io.log(`Wrote ${path.relative(process.cwd(), result.dir)}`)
+  }
+  return result.status
 }
 
-const title =
-  typeof flags.title === 'string'
-    ? flags.title
-    : path.basename(resolved, ext).replace(/[_-]+/g, ' ')
-const slug = slugify(typeof flags.slug === 'string' ? flags.slug : title)
-const topic = typeof flags.topic === 'string' ? flags.topic : undefined
-const dir = path.join(PROBLEMS_DIR, slug)
-
-if (fs.existsSync(dir)) {
-  console.error(`A problem named "${slug}" already exists.`)
-  process.exit(1)
+export function maybeRunCli(metaUrl, entryPath, exitFn = process.exit) {
+  if (isEntryPoint(metaUrl, entryPath)) {
+    exitFn(runCli())
+  }
 }
 
-const photoName = `photo${ext === '.jpeg' ? '.jpg' : ext}`
-fs.mkdirSync(dir, { recursive: true })
-fs.copyFileSync(resolved, path.join(dir, photoName))
-
-const topicLine = topic ? `topic: ${topic}\n` : ''
-fs.writeFileSync(
-  path.join(dir, 'problem.mdx'),
-  `---\ntitle: ${JSON.stringify(title)}\n${topicLine}---\n`,
-)
-
-console.log(`Wrote ${path.relative(process.cwd(), dir)}`)
+maybeRunCli(import.meta.url, process.argv[1])

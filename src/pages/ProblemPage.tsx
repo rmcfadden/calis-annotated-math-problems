@@ -6,7 +6,7 @@ import { topicById } from '../topics.ts'
 
 export function ProblemPage() {
   const { id } = useParams()
-  const problem = id ? getProblem(id) : undefined
+  const problem = getProblem(id ?? '')
 
   if (!problem) {
     return (
