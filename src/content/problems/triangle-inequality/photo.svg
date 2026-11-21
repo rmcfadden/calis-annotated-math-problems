@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-label="Triangle inequality">
+  <rect width="1200" height="900" fill="#f7f1e4"/>
+  <rect x="48" y="48" width="1104" height="804" fill="none" stroke="#d8cbb3" stroke-width="2"/>
+  <text x="96" y="150" fill="#1c1915" font-family="Georgia, serif" font-size="42">Geometry</text>
+  <text x="96" y="240" fill="#1c1915" font-family="Georgia, serif" font-size="40">Photo-only sample. Transcribe later.</text>
+  <polygon points="280,720 640,220 980,720" fill="none" stroke="#1c1915" stroke-width="4"/>
+  <text x="430" y="430" fill="#1c1915" font-family="Georgia, serif" font-size="28">a</text>
+  <text x="820" y="430" fill="#1c1915" font-family="Georgia, serif" font-size="28">b</text>
+  <text x="600" y="770" fill="#1c1915" font-family="Georgia, serif" font-size="28">c = 10</text>
+  <text x="96" y="820" fill="#6b6458" font-family="Georgia, serif" font-size="28">If a = 4 and b = 5, can these lengths form a triangle?</text>
+</svg>
