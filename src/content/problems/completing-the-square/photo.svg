@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-label="Completing the square">
+  <rect width="1200" height="900" fill="#f7f1e4"/>
+  <rect x="48" y="48" width="1104" height="804" fill="none" stroke="#d8cbb3" stroke-width="2"/>
+  <text x="96" y="160" fill="#1c1915" font-family="Georgia, serif" font-size="42">Algebra</text>
+  <text x="96" y="280" fill="#1c1915" font-family="Georgia, serif" font-size="56">Find the positive root of</text>
+  <text x="96" y="390" fill="#1c1915" font-family="Georgia, serif" font-size="72">x²  6x + 9 = 0</text>
+  <text x="96" y="560" fill="#6b6458" font-family="Georgia, serif" font-size="32">Show a short method, not only the number.</text>
+</svg>

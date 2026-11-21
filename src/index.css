@@ -1,0 +1,47 @@
+@import 'tailwindcss';
+@import 'katex/dist/katex.min.css';
+
+@theme {
+  --font-serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
+  --font-sans: 'Source Sans 3', 'Segoe UI', system-ui, sans-serif;
+  --color-paper: #f4efe6;
+  --color-paper-2: #ebe4d6;
+  --color-ink: #1c1915;
+  --color-clay: #9a3412;
+  --color-moss: #3f5c46;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+.problem-prose {
+  font-size: 1.05rem;
+  line-height: 1.7;
+}
+
+.problem-prose > p,
+.problem-prose > ul,
+.problem-prose > ol {
+  margin: 0.85rem 0;
+}
+
+.problem-prose a {
+  color: var(--color-clay);
+  text-decoration: underline;
+}
+
+.problem-prose .katex-display {
+  margin: 1.25rem 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
