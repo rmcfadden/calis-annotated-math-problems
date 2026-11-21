@@ -7,6 +7,7 @@ Static Vite + React site for photographed math problems, hosted on GitHub Pages.
 ```bash
 npm install
 npm run dev
+npm test
 ```
 
 ## Add a problem from a photo

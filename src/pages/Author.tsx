@@ -1,26 +1,18 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { imageExtFromFile, isAllowedImageType } from '../lib/image-file.ts'
 import { TOPICS } from '../topics.ts'
 
-const ALLOWED = ['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml']
-
-function extFromFile(file: File): string {
-  if (file.type === 'image/png') return 'png'
-  if (file.type === 'image/webp') return 'webp'
-  if (file.type === 'image/svg+xml') return 'svg'
-  return 'jpg'
-}
-
-function readDataUrl(file: File): Promise<string> {
+export function readDataUrl(file: Blob): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
     reader.onload = () => resolve(String(reader.result))
-    reader.onerror = () => reject(reader.error)
+    reader.onerror = () => reject(reader.error ?? new Error('Could not read the image.'))
     reader.readAsDataURL(file)
   })
 }
 
-export function Author() {
+export function Author({ allowAuthoring = import.meta.env.DEV }: { allowAuthoring?: boolean } = {}) {
   const navigate = useNavigate()
   const [title, setTitle] = useState('')
   const [topic, setTopic] = useState('')
@@ -29,7 +21,7 @@ export function Author() {
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
 
-  if (!import.meta.env.DEV) {
+  if (!allowAuthoring) {
     return (
       <p className="text-ink/70">
         Authoring is only available in local development. Add photos to the repo, then push.
@@ -54,7 +46,7 @@ export function Author() {
           title,
           topic: topic || undefined,
           imageBase64,
-          imageExt: extFromFile(file),
+          imageExt: imageExtFromFile(file),
         }),
       })
       const body = (await response.json()) as { id?: string; error?: string }
@@ -110,7 +102,7 @@ export function Author() {
             className="mt-1 block w-full text-sm text-ink/80"
             onChange={(event) => {
               const next = event.target.files?.[0] ?? null
-              if (next && !ALLOWED.includes(next.type) && next.type !== '') {
+              if (next && !isAllowedImageType(next.type)) {
                 setError('Use a jpg, png, webp, or svg image.')
                 setFile(null)
                 setPreview(null)

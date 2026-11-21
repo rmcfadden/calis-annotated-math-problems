@@ -10,10 +10,11 @@ export function AnswerCheck() {
   const [wrong, setWrong] = useState(false)
 
   if (!problem.answer) return null
+  const expected = problem.answer
 
   function onSubmit(event: FormEvent) {
     event.preventDefault()
-    if (answersMatch(problem.answer ?? '', value)) {
+    if (answersMatch(expected, value)) {
       markSolved(problem.id)
       setSolved(true)
       setWrong(false)

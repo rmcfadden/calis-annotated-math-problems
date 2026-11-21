@@ -33,13 +33,13 @@ const mdxModules = import.meta.glob<{
   frontmatter?: ProblemFrontmatter
 }>('../content/problems/*/problem.mdx', { eager: true })
 
-function folderId(filePath: string): string {
+export function folderIdFromPath(filePath: string): string {
   const match = filePath.match(/problems\/([^/]+)\//)
   if (!match) throw new Error(`Could not read problem id from ${filePath}`)
   return match[1]
 }
 
-function titleFromId(id: string): string {
+export function titleFromId(id: string): string {
   return id
     .split('-')
     .filter(Boolean)
@@ -50,7 +50,7 @@ function titleFromId(id: string): string {
 function mdxById(): Map<string, { default: MdxProblem; frontmatter?: ProblemFrontmatter }> {
   const map = new Map<string, { default: MdxProblem; frontmatter?: ProblemFrontmatter }>()
   for (const [filePath, mod] of Object.entries(mdxModules)) {
-    map.set(folderId(filePath), mod)
+    map.set(folderIdFromPath(filePath), mod)
   }
   return map
 }
@@ -58,7 +58,7 @@ function mdxById(): Map<string, { default: MdxProblem; frontmatter?: ProblemFron
 export function loadProblems(): Problem[] {
   const mdx = mdxById()
   const problems: Problem[] = Object.entries(photoModules).map(([filePath, photoUrl]) => {
-    const id = folderId(filePath)
+    const id = folderIdFromPath(filePath)
     const extra = mdx.get(id)
     const frontmatter = extra?.frontmatter
     return {
